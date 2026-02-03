@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Todo = require('../models/Todo');
+const authMiddleware = require('../middleware/authMiddleware');
+
+router.use(authMiddleware); //? Apply auth middleware to all routes below
 
 //! Create a ToDo
 //! POST /api/todos
@@ -8,12 +11,13 @@ const Todo = require('../models/Todo');
 router.post('/', async (req, res) => {
     try {
         //! Get Data from the request body
-        const { title, description, user } = req.body;
+        const { title, description } = req.body;
 
         //! Create a new Todo Object
         const newTodo = new Todo({
             title,
             description,
+            user: req.user.userId //? Attach the logged-in User's ID!
         });
 
         //! Save it on DB
@@ -33,7 +37,7 @@ router.post('/', async (req, res) => {
 //! GET /api/todos
 router.get('/', async(req,res) => {
     try {
-        const todos = await Todo.find();    //? Fetch all todos from the database   .find() is a Mongoose method - retrieves all documents
+        const todos = await Todo.find({ user: req.user.userId });    //? Fetch all todos from the database   .find() is a Mongoose method - retrieves all documents
         res.status(200).json(todos);
     } catch (error) {
         res.status(500).json({message: error.message});
