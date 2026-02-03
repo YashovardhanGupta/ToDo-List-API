@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const todoRoutes = require('./routes/todoRoutes');
-
+const authRoutes = require('./routes/authRoutes');
 
 
 
@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
     res.send('Hello! The To-Do API is running.');
 });
 app.use('/api/todos', todoRoutes);
+app.use('/api/auth', authRoutes);
 
 //! Start Server
 app.listen(PORT, () => {
