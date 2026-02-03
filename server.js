@@ -9,7 +9,6 @@ const authRoutes = require('./routes/authRoutes');
 
 //! Initialize app
 const app = express();
-const PORT = 3000;
 
 app.use(express.json());
 
@@ -26,6 +25,6 @@ app.use('/api/todos', todoRoutes);
 app.use('/api/auth', authRoutes);
 
 //! Start Server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
