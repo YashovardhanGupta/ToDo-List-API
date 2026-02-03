@@ -33,12 +33,35 @@ router.post('/', async (req, res) => {
     }
 })
 
-//! Read all ToDos
-//! GET /api/todos
+//! Read all ToDos (Protected + Pagination)
+//! GET /api/todos?page=1&limit=10
 router.get('/', async(req,res) => {
     try {
-        const todos = await Todo.find({ user: req.user.userId });    //? Fetch all todos from the database   .find() is a Mongoose method - retrieves all documents
-        res.status(200).json(todos);
+
+        //? 1. Read the qurey parameters from the URL
+        //? Default to page 1 and limit 10 if not provided
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        //? 2. Calculate how many items to skip
+        //? Ex: if on page 2, skip the first 10 items
+        const skip = (page - 1) * limit;
+
+        //? Fetch the data with limits 
+        //? .skip() jumps over the first time X items
+        //? .limit() stops fetching after Y items
+        const todos = await Todo.find({ user: req.user.userId })
+                                .skip(skip)
+                                .limit(limit);    
+
+        //? 4. Count total items (for the frontend to know how many pages exist)
+        const total = await Todo.countDocuments({ user: req.user.userId });
+        res.status(200).json({
+            data: todos,
+            page,
+            limit,
+            total
+        });
     } catch (error) {
         res.status(500).json({message: error.message});
     }
